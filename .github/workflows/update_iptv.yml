@@ -1,58 +1,54 @@
 name: Update IPTV Playlist
-
 on:
   schedule:
-    - cron: "0 18 * * *"   # 01:00 ICT hàng ngày
+    - cron: "0 18 * * *"
   workflow_dispatch:
   push:
     paths:
-      - "update_iptv.py"   # Tự chạy khi cập nhật code
-
+      - "update_iptv.py"
 permissions:
   contents: write
-
 jobs:
   update-playlist:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
+      
       - name: Install dependencies
         run: pip install requests
-
+      
       - name: Set Timezone to Vietnam (ICT)
         run: sudo timedatectl set-timezone Asia/Ho_Chi_Minh
-
+      
       - name: List files (debug)
         run: |
           echo "Hiện tại là: $(date +'%Y-%m-%d %H:%M:%S %Z')"
           ls -la
-
+      
       - name: Run IPTV updater
         run: python update_iptv.py
-
-     - name: Commit & push http-iptv.m3u
-      run: |
-        git config user.name  "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add http-iptv.m3u
-        
-        VIETNAM_TIME=$(date +'%d/%m/%Y %H:%M')
-        
-        if git diff --cached --quiet; then
-          echo "⚠️ NO CHANGES - nothing to commit"
-        else
-          git commit -m "🔄 Auto-update IPTV ($VIETNAM_TIME ICT)"
-          git pull --rebase
-          git push
-        fi
+      
+      - name: Commit & push http-iptv.m3u
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add http-iptv.m3u
+          
+          VIETNAM_TIME=$(date +'%d/%m/%Y %H:%M')
+          
+          if git diff --cached --quiet; then
+            echo "⚠️ NO CHANGES - nothing to commit"
+          else
+            git commit -m "🔄 Auto-update IPTV ($VIETNAM_TIME ICT)"
+            git pull --rebase
+            git push
+          fi
