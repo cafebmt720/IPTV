@@ -41,14 +41,18 @@ jobs:
       - name: Run IPTV updater
         run: python update_iptv.py
 
-      - name: Commit & push http-iptv.m3u
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add http-iptv.m3u
-          
-          # Lấy thời gian hiện tại theo định dạng VN
-          VIETNAM_TIME=$(date +'%d/%m/%Y %H:%M')
-          
-          git diff --cached --quiet || git commit -m "🔄 Auto-update IPTV ($VIETNAM_TIME ICT)"
+     - name: Commit & push http-iptv.m3u
+      run: |
+        git config user.name  "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add http-iptv.m3u
+        
+        VIETNAM_TIME=$(date +'%d/%m/%Y %H:%M')
+        
+        if git diff --cached --quiet; then
+          echo "⚠️ NO CHANGES - nothing to commit"
+        else
+          git commit -m "🔄 Auto-update IPTV ($VIETNAM_TIME ICT)"
+          git pull --rebase
           git push
+        fi
