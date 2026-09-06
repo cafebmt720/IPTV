@@ -21,16 +21,16 @@ import requests
 # CẤU HÌNH
 # ──────────────────────────────────────────────────────────────────────
 SOURCES: Final[list[str]] = [
+    "https://1.org.vn/vmttv",
+    "https://vmttv.duckdns.org/",
+    "https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/vn.m3u",
     "https://dl.dropboxusercontent.com/s/o5vygit34v9ryly71gam4/coban66.m3u?rlkey=auyoon54hfubajt16nc7u7dbn&st=70gyvtcu&dl=0",
-    # "https://raw.githubusercontent.com/quanlehong539/TVPub/patch-3/TVPub%20IPTV",
-    # "https://1.org.vn/vmttv",
-    # "https://vmttv.duckdns.org/",
-    # "https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/vn.m3u",
 ]
 
-EPG_URL: Final[str] = "https://epg.io.vn/epg.xml"
+EPG_URL: Final[str] = "https://vnepg.site/epg.xml"
 OUTPUT_FILE: Final[str] = "http-iptv.m3u"
 GLOBAL_TIMEOUT: Final[int] = 20
+MAX_RETRIES: Final[int] = 3
 HTTP_HEADERS: Final[dict[str, str]] = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -421,13 +421,25 @@ def quality_score(raw: str) -> tuple[int, float]:
 
 
 def fetch(url: str) -> Optional[str]:
-    try:
-        r = requests.get(url, timeout=GLOBAL_TIMEOUT, headers=HTTP_HEADERS)
-        r.raise_for_status()
-        return r.text
-    except Exception as e:
-        print(f"  ⚠  {url}: {e}", file=sys.stderr)
-        return None
+    """Fetch with retry logic."""
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            print(f"     🔄 Attempt {attempt}/{MAX_RETRIES}: {url[:55]}...")
+            r = requests.get(url, timeout=GLOBAL_TIMEOUT, headers=HTTP_HEADERS)
+            r.raise_for_status()
+            print(f"     ✅ Success!")
+            return r.text
+        except requests.exceptions.Timeout:
+            print(f"     ⏱️  Timeout (attempt {attempt}/{MAX_RETRIES})")
+        except requests.exceptions.ConnectionError as e:
+            print(f"     🚫 Connection error: {e} (attempt {attempt}/{MAX_RETRIES})")
+        except requests.exceptions.HTTPError as e:
+            print(f"     ❌ HTTP {e.response.status_code} (attempt {attempt}/{MAX_RETRIES})")
+        except Exception as e:
+            print(f"     ❌ {type(e).__name__}: {e} (attempt {attempt}/{MAX_RETRIES})")
+    
+    print(f"     ⚠️  FAILED after {MAX_RETRIES} attempts", file=sys.stderr)
+    return None
 
 
 def resolve_display_name(raw: str, tvg_id: str) -> str:
@@ -596,7 +608,7 @@ def write_m3u(channels: list[Channel], path: str) -> None:
                     f'group-title="{ch.group_label}",{ch.name}\n'
                     f"{ch.url}\n"
                 )
-        print(f"✅  Đã ghi {len(channels)} kênh → {path}")
+        print(f"\n✅  Đã ghi {len(channels)} kênh → {path}")
     except IOError as e:
         print(f"❌  Lỗi ghi file {path}: {e}", file=sys.stderr)
         sys.exit(1)
@@ -606,25 +618,45 @@ def write_m3u(channels: list[Channel], path: str) -> None:
 # MAIN
 # ──────────────────────────────────────────────────────────────────────
 def main() -> None:
-    print(f"📡  EPG: {EPG_URL}")
+    print(f"📡  EPG: {EPG_URL}\n")
+    print(f"📋  Số nguồn cấu hình: {len(SOURCES)}\n")
 
     processed: list[list[Channel]] = []
+    success_count = 0
+    
     for idx, src in enumerate(SOURCES, 1):
-        print(f"\n[{idx}/{len(SOURCES)}] Tải: {src}")
+        print(f"[{idx}/{len(SOURCES)}] Tải nguồn:")
+        print(f"  URL: {src[:70]}...")
         text = fetch(src)
-        if not text or "#EXTM3U" not in text:
-            print("  ⚠  Bỏ qua (không phải M3U hợp lệ)")
+        
+        if not text:
+            print(f"  ⚠️  Bỏ qua (không thể fetch)")
             continue
+        
+        if "#EXTM3U" not in text:
+            print(f"  ⚠️  Bỏ qua (không phải M3U hợp lệ)")
+            continue
+        
         parsed = parse_m3u(text)
-        print(f"     Nhận diện {len(parsed)} kênh TV")
-        if parsed:
-            processed.append(parsed)
+        if not parsed:
+            print(f"  ⚠️  Bỏ qua (không tìm thấy kênh hợp lệ)")
+            continue
+        
+        print(f"  📺 Nhận diện {len(parsed)} kênh TV")
+        processed.append(parsed)
+        success_count += 1
 
     if not processed:
-        print("❌  Không có nguồn nào hợp lệ.", file=sys.stderr)
+        print(f"\n❌ FATAL: Không có nguồn nào hợp lệ!", file=sys.stderr)
+        print(f"\n📍 Kiểm tra:", file=sys.stderr)
+        print(f"   • SOURCES URLs có còn hoạt động?", file=sys.stderr)
+        print(f"   • Network bị timeout hay bị chặn?", file=sys.stderr)
+        print(f"   • Firewall/Proxy ngăn cản?", file=sys.stderr)
         sys.exit(1)
 
-    print("\n🔀  Gộp & dedup…")
+    print(f"\n✅ Thành công: {success_count}/{len(SOURCES)} nguồn có dữ liệu\n")
+
+    print("🔀  Gộp, dedup & sắp xếp…")
     final = sort_channels(merge_sources(processed))
 
     gcnt = Counter(ch.group_key for ch in final)
@@ -636,6 +668,7 @@ def main() -> None:
     )
 
     write_m3u(final, OUTPUT_FILE)
+    print("\n🎉  Hoàn tất!")
 
 
 if __name__ == "__main__":
