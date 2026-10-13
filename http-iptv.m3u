@@ -28,18 +28,12 @@ https://vips-livecdn.fptplay.net/live/media/vtv8/live-hls-avc/live-hls-avc/index
 https://vips-livecdn.fptplay.net/live/media/vtv9/live247-hls-avc/index.m3u8
 #EXTINF:-1 tvg-id="vtv10hd" tvg-logo="https://i.postimg.cc/4nY8BrVK/V10.png" group-title="VTV",VTV10
 https://vips-livecdn.fptplay.net/live/media/vtv10/live247-hls-avc/index.m3u8
-#EXTINF:-1 tvg-id="vtv10.vn@hd" tvg-logo="" group-title="VTV",VTV10 (1080p)
-https://live-a.fptplay53.net/live/media/vtv10/live247-hls-avc/index.m3u8
-#EXTINF:-1 tvg-id="vtv10.vn@sd" tvg-logo="" group-title="VTV",VTV10 (1080p) [Geo-blocked]
-https://live.fptplay53.net/fnxhd1/vtvcantho_vhls.smil/chunklist.m3u8
 #EXTINF:-1 tvg-id="vtv10.vn@hd" tvg-logo="" group-title="VTV",VTV10 (720p)
 https://dethich.pw/vtv10/index.m3u8
 #EXTINF:-1 tvg-id="vtv5taynambo.vn@hd" tvg-logo="" group-title="VTV",VTV5 Tay Nam Bo
-https://live-a.fptplay53.net/live/media/vtv5tnb/live-hls-avc/index.m3u8
+https://vtvgolive-failover.vtvdigital.vn/vtvgo/vtv5tnb-manifest.m3u8
 #EXTINF:-1 tvg-id="vtv5taynguyen.vn@hd" tvg-logo="" group-title="VTV",VTV5 Tay Nguyen
 https://vtvgolive-failover.vtvdigital.vn/vtvgo/vtv5tn-manifest.m3u8
-#EXTINF:-1 tvg-id="vtv6.vn@hd" tvg-logo="" group-title="VTV",VTV6 (1080p)
-https://live-a.fptplay53.net/live/media/vtv6/live247-hls-avc/index.m3u8
 #EXTINF:-1 tvg-id="vtv6.vn@hd" tvg-logo="" group-title="VTV",VTV6 (720p)
 https://dethich.pw/vtv6/index.m3u8
 #EXTINF:-1 tvg-id="htv1hd" tvg-logo="https://i.imgur.com/KEMSBD3.png" group-title="HTV",HTV1
