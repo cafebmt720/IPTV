@@ -32,8 +32,6 @@ https://vtvgolivepre-vtv02.vtvdigital.vn/hls/vtv/live/vtv10__vtv720p-h264/index.
 https://vips-livecdn.fptplay.net/live/media/vtv10/live247-hls-avc/index.m3u8
 #EXTINF:-1 tvg-id="vtv10.vn@hd" tvg-logo="" group-title="VTV",VTV10 (720p)
 https://dethich.pw/vtv10/index.m3u8
-#EXTINF:-1 tvg-id="vtv5taynguyen.vn@hd" tvg-logo="" group-title="VTV",VTV5 Tay Nguyen
-https://vips-livecdn.fptplay.net/live/media/vtv5tn/live-hls-avc/index.m3u8
 #EXTINF:-1 tvg-id="vtv6.vn@hd" tvg-logo="" group-title="VTV",VTV6 (1080p)
 https://vips-livecdn.fptplay.net/live/media/vtv6/live247-hls-avc/index.m3u8
 #EXTINF:-1 tvg-id="vtv6.vn@hd" tvg-logo="" group-title="VTV",VTV6 (720p)
