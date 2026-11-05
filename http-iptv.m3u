@@ -71,7 +71,7 @@ https://1011154949.vnns.net/CDN-FPT02/HTVC-PLUS-HD-1080p/playlist.m3u8
 #EXTINF:-1 tvg-id="htvsports.vn@sd" tvg-logo="" group-title="HTV",HTV Sports
 https://dethich.pw/htvthethao/index.m3u8
 #EXTINF:-1 tvg-id="htvsports.vn@sd" tvg-logo="" group-title="HTV",HTV Sports (1080i)
-https://vmttv.dpdns.org/tv360/?id=htv-the-thao
+https://vmttv.dpdns.org/tv360?id=htv-the-thao
 #EXTINF:-1 tvg-id="htv1.vn@sd" tvg-logo="" group-title="HTV",HTV1 (720p)
 https://dethich.pw/htv1/index.m3u8
 #EXTINF:-1 tvg-id="htv2.vn@sd" tvg-logo="" group-title="HTV",HTV2 (720p)
